@@ -1,6 +1,6 @@
 import copy
 import os
-import file_IO
+import fileIO
 
 # This class holds the data for the SmartSEM tiff images
 
@@ -94,12 +94,12 @@ class TiffData():
 def setup_config_file(config_file_path: str, required_data: dict):
 
     if not os.path.isfile(config_file_path):
-        file_IO.create_config_file(config_file_path, required_data)
+        fileIO.create_config_file(config_file_path, required_data)
 
     else:
-        file_IO.verify_config_fields(config_file_path, required_data)
+        fileIO.verify_config_fields(config_file_path, required_data)
 
-    return file_IO.read_config_data(config_file_path)
+    return fileIO.read_config_data(config_file_path)
 
 
 def create_tifs(path_to_tifs: list):
@@ -132,13 +132,14 @@ def create_header(tiff_data: TiffData, run_settings: dict):
 
     header = ["Filename"]
     exclusion_mode = int(run_settings["General"]["parameter selection mode"])
+    selected_params = [x.upper() for x in run_settings["Parameters"]]
 
     # Include selected
     if exclusion_mode == 1:
-        tmp_params = [x for x in tiff_data.get_data() if x in run_settings["Parameters"]]
+        tmp_params = [x for x in tiff_data.get_data() if x in selected_params]
     # Exclude selected
     elif exclusion_mode == 2:
-        tmp_params = [x for x in tiff_data.get_data() if x not in run_settings["Parameters"]]
+        tmp_params = [x for x in tiff_data.get_data() if x not in selected_params]
     # Include all
     else:
         tmp_params = copy.copy(tiff_data.get_data())
@@ -152,7 +153,9 @@ def create_csv_data(tif_data: list, header: list):
 
     data_list = []
     for tif in tif_data:
-        data_list.append(tif.get_matching_data(header))
+        tmp_data = [tif.file_name]
+        tmp_data.extend(tif.get_matching_data(header))
+        data_list.append(tmp_data)
     return data_list
 
 
@@ -180,7 +183,7 @@ def write_data_to_csv(tif_data: list, run_settings: dict):
     data = create_csv_data(tif_data, header)
 
     # Write header and data to csv
-    file_IO.write_list_to_csv(data, header, path_to_csv)
+    fileIO.write_list_to_csv(data, header, path_to_csv)
 
 
 if __name__ == "__main__":
@@ -188,15 +191,17 @@ if __name__ == "__main__":
     # Special list of most relevant Parameters
     selected_params = {"AP_BEAMSHIFT_X": None, "AP_BEAMSHIFT_Y": None, "AP_STIG_X": None,
                        "AP_STIG_Y": None, "AP_APERTURE_X": None, "AP_APERTURE_Y": None,
-                       "AP_TARGETKV": None}
+                       "AP_TARGETKV": None, "AP_IMAGE_PIXEL_SIZE": None, "AP_MAG": None,
+                       "AP_WD": None, "DP_DWELL_TIME": None}
+
     # Specify necessary config data
-    default_data = {"General": {"search directory": os.getcwd(), "parameter selection mode": "0",
+    default_data = {"General": {"search directory": os.getcwd(), "parameter selection mode": "1",
                                 "csv directory": os.getcwd()}, "Parameters": selected_params}
 
     # Read or create config if it does not exist
-    script_settings = setup_config_file(os.getcwd() + "\\config.ini", default_data)
+    script_settings = setup_config_file(os.getcwd() + "\\tif_extractor_config.ini", default_data)
     # Find all files that have .tif extensions
-    tif_paths = file_IO.find_files(script_settings["General"]["search directory"], ".tif")
+    tif_paths = fileIO.find_files(script_settings["General"]["search directory"], ".tif")
     # Create tif objects from file paths
     tif_data = create_tifs(tif_paths)
 
