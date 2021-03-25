@@ -11,7 +11,7 @@ def create_config_file(config_file_path: str, data: dict):
         return
 
     # copy the data to configparser obj
-    config_data = configparser.ConfigParser()
+    config_data = configparser.ConfigParser(allow_no_value=True)
     for section in data:
         config_data[section] = {}
         for field in data[section]:
@@ -27,7 +27,8 @@ def create_config_file(config_file_path: str, data: dict):
 def verify_config_fields(config_file_path: str, default_data: dict):
 
     write_needed = False
-    read_data = configparser.ConfigParser()
+    # Allow entries with no value
+    read_data = configparser.ConfigParser(allow_no_value=True)
     read_data.read(config_file_path)
 
     for section in default_data:
@@ -35,21 +36,26 @@ def verify_config_fields(config_file_path: str, default_data: dict):
         # Create section if not there
         if section not in read_data:
             read_data[section] = {}
+            write_needed = True
 
         for field in default_data[section]:
 
+            # Add field if not present
             if field not in read_data[section]:
                 read_data[section][field] = default_data[section][field]
+                write_needed = True
 
     if write_needed:
-        read_data.write(config_file_path)
+        with open(config_file_path, "w") as cf:
+            read_data.write(cf)
 
 
 # Returns a copy of config file data (assumes config file exists)
 def read_config_data(conifg_file_path: str):
 
     data_to_return = {}
-    config_data = configparser.ConfigParser()
+    # Allow for entries with no value
+    config_data = configparser.ConfigParser(allow_no_value=True)
     config_data.read(conifg_file_path)
 
     for section in config_data:
@@ -78,14 +84,13 @@ def find_files(search_path: str, file_pattern: str):
 def write_list_to_csv(data: list, header: list = None, file_path: str = None):
 
     if file_path is None:
-        file_path = os.getcwd() + "\\data.csv"
+        file_path = os.getcwd() + "\\csv_data.csv"
 
     with open(file_path, "w", newline="") as csv_file:
         csv_writer = csv.writer(csv_file)
         if header is not None:
             csv_writer.writerow(header)
-        for entry in data:
-            csv_writer.writerows(data)
+        csv_writer.writerows(data)
 
 
 if __name__ == "__main__":
