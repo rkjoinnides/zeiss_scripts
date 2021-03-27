@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 venv
 .vscode
 *__pycache__
 *.tif
+=======
+venv
+.vscode
+*__pycache__
+*.tif
+*.ini
+*.csv
+>>>>>>> e76666121c1b41b8b6c864958a5e908059c39b07
