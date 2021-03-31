@@ -72,12 +72,12 @@ class TiffData():
 
             # Even lines contain smartSEM parameter names
             if i % 2 == 0:
-                self._processed_data[line] = []
+                self._processed_data[line] = ""
                 last_param = line
 
             # Odd lines contain parameter values
             else:
-                self._processed_data[last_param].append(line)
+                self._processed_data[last_param] = line
 
     def get_data(self):
         return copy.deepcopy(self._processed_data)
@@ -205,5 +205,6 @@ if __name__ == "__main__":
     # Create tif objects from file paths
     tif_data = create_tifs(tif_paths)
 
-    # Write the tif data to csv
-    write_data_to_csv(tif_data, script_settings)
+    # Write the tif data to csv if exists
+    if len(tif_paths) != 0:
+        write_data_to_csv(tif_data, script_settings)

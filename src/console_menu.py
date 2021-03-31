@@ -68,7 +68,7 @@ class Menu:
     def choose_item(self):
         print("Please choose an item")
         response = ""
-        while response != len(self.items)-1:
+        while response != len(self.items) - 1:
 
             self.show()
 
