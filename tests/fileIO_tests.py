@@ -46,14 +46,13 @@ class ConfigHandlingTest(unittest.TestCase):
 
         # create a number of config files
         cls.config_file_names = []
-        
+
         for i in range(20):
 
             config_file_name = "Config" + str(i) + ".ini"
             data = generate_random_config_data()
             fileIO.create_config_file(".\\" + config_file_name, data)
             cls.config_file_names.append(config_file_name)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -89,16 +88,21 @@ def generate_random_config_data():
 
     for s in range(num_sections):
         section_length = random.randint(1, 25)
-        section_name = "".join(random.choices(string.ascii_letters + string.digits, k=section_length))
+        section_name = "".join(random.choices(string.ascii_letters + string.digits,
+                               k=section_length))
         data[section_name] = {}
 
         num_fields = random.randint(1, 50)
         for f in range(num_fields):
             field_length = random.randint(1, 25)
-            field_name = "".join(random.choices(string.ascii_letters + string.digits, k=field_length))
+            field_name = "".join(random.choices(string.ascii_letters + string.digits,
+                                 k=field_length))
 
             entry_length = random.randint(1, 25)
-            entry_content = "".join(random.choices(string.ascii_letters + string.digits, k=entry_length))
+            entry_content = "".join(random.choices(string.ascii_letters + string.digits,
+                                    k=entry_length))
+
+            data[field_name] = entry_content
 
     return(data)
 
